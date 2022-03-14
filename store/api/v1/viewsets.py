@@ -11,23 +11,18 @@ User = get_user_model()
 
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
-    queryset = Product.objects.none()
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
-        if self.request.user.is_authenticated and self.request.user.balance > 0:
+        if self.request.user.balance > 0:
             return Product.objects.all()
 
 
 class GetTransactionViewSet(ModelViewSet):
     serializer_class = GetTransactionSerializer
-    queryset = Transaction.objects.none()
+    queryset = Transaction.objects.all()
     permission_classes = (IsAuthenticated, )
     http_method_names = ['get']
-
-    def get_queryset(self):
-        if self.request.user.is_authenticated:
-            return Transaction.objects.all()
 
 
 class CreateTransactionViewSet(ModelViewSet):
@@ -48,7 +43,10 @@ class CreateTransactionViewSet(ModelViewSet):
             # Here we check user's balance is greater or equal to the price of the product
             if user.balance >= instance.price:
                 # If above all checks are passed than we create the transaction
-                transaction = Transaction(buyer=user, seller=instance.owner, price=instance.price)
+                transaction = Transaction(buyer=user,
+                                          seller=instance.owner,
+                                          price=instance.price,
+                                          product=instance)
                 transaction.save()
                 # Here we detect the price of product from the buyer balance
                 user.balance -= instance.price

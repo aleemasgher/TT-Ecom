@@ -24,6 +24,7 @@ class Product(models.Model):
 class Transaction(models.Model):
     buyer = models.ForeignKey(User, on_delete=models.CASCADE, related_name="product_buyer")
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="product_seller")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="product")
     price = models.FloatField()
 
     updated = models.DateTimeField(auto_now=True)
